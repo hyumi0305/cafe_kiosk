@@ -1,0 +1,2541 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="theme-color" content="#fff8ed">
+
+	<title>우리 카페 키오스크</title>
+
+
+<style>
+/* =========================
+기본 설정
+========================= */
+
+* {
+	box-sizing: border-box;
+}
+
+:root {
+	--cream: #fff8ed;
+	--white: #ffffff;
+	--brown: #765039;
+	--dark-brown: #493323;
+	--light-brown: #ead8c5;
+	--accent: #b77b50;
+	--text: #34271e;
+	--muted: #88796d;
+	--shadow: 0 5px 18px rgba(80, 55, 35, 0.09);
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	background: var(--cream);
+	color: var(--text);
+	font-family: "Noto Sans KR", Arial, sans-serif;
+	font-size: 17px;
+	line-height: 1.6;
+}
+
+button,
+input {
+	font: inherit;
+}
+
+button {
+	cursor: pointer;
+	border: none;
+	transition: 0.2s;
+}
+
+button:hover {
+	filter: brightness(0.94);
+	transform: translateY(-1px);
+}
+
+button:focus-visible,
+input:focus-visible {
+	outline: 3px solid #d58c4e;
+	outline-offset: 3px;
+}
+
+/* =========================
+공통
+========================= */
+
+.hidden {
+	display: none !important;
+}
+
+.screen {
+	width: 100%;
+	min-height: 70vh;
+	padding: 35px 20px;
+}
+
+.menu-container {
+	width: 100%;
+	max-width: 1200px;
+	margin: 0 auto;
+}
+
+h1,
+h2,
+h3,
+p {
+	overflow-wrap: break-word;
+}
+
+h2 {
+	color: var(--dark-brown);
+	font-size: 29px;
+	margin-top: 10px;
+}
+
+h3 {
+	color: var(--brown);
+}
+
+p {
+	color: var(--muted);
+}
+
+/* =========================
+상단 헤더
+========================= */
+
+.header {
+	background: var(--white);
+	padding: 18px 30px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 18px;
+	box-shadow: var(--shadow);
+}
+
+.header h1 {
+	margin: 0;
+	color: var(--brown);
+	font-size: 28px;
+}
+
+.header-controls {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	flex-wrap: wrap;
+	gap: 15px;
+}
+
+.language-controls,
+.text-controls {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 7px;
+}
+
+.language-button,
+.text-controls button {
+	background: #f3e8dc;
+	color: var(--brown);
+	border-radius: 9px;
+	padding: 9px 13px;
+	font-weight: 600;
+}
+
+.language-button.active {
+	background: var(--brown);
+	color: white;
+}
+
+#accessibility-button {
+	background: #55402e;
+	color: white;
+}
+
+/* =========================
+시작 화면
+========================= */
+
+#welcome-title {
+	font-size: 42px;
+}
+
+.welcome {
+	max-width: 750px;
+	margin: 40px auto;
+	padding: 55px 25px;
+	text-align: center;
+	background: var(--white);
+	border-radius: 25px;
+	box-shadow: var(--shadow);
+}
+
+.welcome-label {
+	color: var(--accent);
+	font-weight: bold;
+	letter-spacing: 5px;
+}
+
+.welcome p {
+	font-size: 18px;
+}
+
+.main-button {
+	background: var(--brown);
+	color: white;
+	border-radius: 13px;
+	padding: 16px 27px;
+	font-size: 18px;
+	font-weight: bold;
+	min-height: 55px;
+}
+
+#start-order {
+	margin-top: 25px;
+	min-width: 250px;
+	min-height: 70px;
+	font-size: 23px;
+}
+
+.qr-order-area {
+	max-width: 430px;
+	margin: 30px auto;
+	padding: 25px;
+	text-align: center;
+	background: white;
+	border-radius: 20px;
+	box-shadow: var(--shadow);
+}
+
+#kiosk-qr-code {
+	display: flex;
+	justify-content: center;
+	margin: 20px auto;
+}
+
+#kiosk-qr-code img,
+#kiosk-qr-code canvas,
+#order-status-qr img,
+#order-status-qr canvas,
+#mobile-status-qr img,
+#mobile-status-qr canvas {
+	max-width: 100%;
+	height: auto;
+	padding: 8px;
+	background: white;
+}
+
+/* =========================
+식사 / 포장 선택
+========================= */
+
+.dining-options {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 25px;
+	margin-top: 45px;
+}
+
+.dining-options button {
+	min-height: 180px;
+	font-size: 25px;
+	border-radius: 20px;
+}
+
+/* =========================
+메뉴 화면
+========================= */
+
+.menu-heading {
+	margin-bottom: 25px;
+}
+
+.category-buttons {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin: 25px 0;
+}
+
+.category {
+	background: var(--light-brown);
+	color: var(--dark-brown);
+	padding: 12px 22px;
+	border-radius: 12px;
+	font-weight: bold;
+	min-height: 48px;
+}
+
+.category.active {
+	background: var(--brown);
+	color: white;
+}
+
+.menu-list {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 22px;
+	margin: 25px 0;
+}
+
+.menu-card {
+	background: white;
+	padding: 22px;
+	border-radius: 18px;
+	box-shadow: var(--shadow);
+	margin-bottom: 18px;
+}
+
+.menu-item {
+	background: white;
+	overflow: hidden;
+	border-radius: 18px;
+	box-shadow: var(--shadow);
+	display: flex;
+	flex-direction: column;
+}
+
+.menu-item img {
+	width: 100%;
+	height: 190px;
+	object-fit: cover;
+	background: #eee3d8;
+}
+
+.menu-item-content {
+	padding: 17px;
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+}
+
+.menu-item h3 {
+	font-size: 21px;
+	margin: 0 0 5px;
+}
+
+.menu-item p {
+	margin: 5px 0;
+}
+
+.menu-price {
+	color: var(--dark-brown);
+	font-size: 20px;
+	font-weight: bold;
+	margin-top: auto;
+	padding: 10px 0;
+}
+
+.menu-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.menu-actions button {
+	flex: 1;
+	min-height: 45px;
+	border-radius: 9px;
+	font-weight: bold;
+}
+
+.detail-button {
+	background: #eee1d3;
+	color: var(--brown);
+}
+
+.add-button {
+	background: var(--brown);
+	color: white;
+}
+
+/* =========================
+장바구니
+========================= */
+
+.cart-bar {
+	position: sticky;
+	bottom: 0;
+	z-index: 5;
+	background: white;
+	padding: 18px;
+	margin-top: 25px;
+	border-radius: 15px;
+	box-shadow: 0 -4px 15px rgba(60, 40, 20, 0.08);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 15px;
+}
+
+.cart-bar strong {
+	color: var(--brown);
+	font-size: 20px;
+	margin-right: 15px;
+}
+
+.cart-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 15px;
+	flex-wrap: wrap;
+	background: white;
+	padding: 18px;
+	margin: 12px 0;
+	border-radius: 13px;
+	box-shadow: var(--shadow);
+}
+
+.quantity-controls {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.quantity-controls button {
+	background: var(--light-brown);
+	color: var(--brown);
+	width: 40px;
+	height: 40px;
+	border-radius: 9px;
+	font-weight: bold;
+}
+
+/* =========================
+메뉴 설명 팝업
+========================= */
+
+.modal {
+	position: fixed;
+	inset: 0;
+	z-index: 100;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+	background: rgba(0, 0, 0, 0.55);
+}
+
+.modal-content {
+	width: 100%;
+	max-width: 550px;
+	max-height: 85vh;
+	overflow-y: auto;
+	position: relative;
+	padding: 30px;
+	border-radius: 20px;
+	background: white;
+	box-shadow: var(--shadow);
+}
+
+.close-button {
+	position: absolute;
+	top: 12px;
+	right: 15px;
+	background: #eee1d3;
+	color: var(--brown);
+	border-radius: 50%;
+	width: 40px;
+	height: 40px;
+	font-size: 20px;
+}
+
+#menu-detail-content img {
+	width: 100%;
+	max-height: 280px;
+	object-fit: cover;
+	border-radius: 13px;
+}
+
+/* =========================
+추가 서비스 / 결제
+========================= */
+
+#options-screen .menu-card label {
+	display: flex;
+	align-items: center;
+	gap: 13px;
+	font-size: 18px;
+	cursor: pointer;
+}
+
+input[type="checkbox"] {
+	width: 23px;
+	height: 23px;
+	accent-color: var(--brown);
+}
+
+#phone-number {
+	width: 100%;
+	max-width: 350px;
+	padding: 13px;
+	border: 1px solid var(--light-brown);
+	border-radius: 10px;
+	margin-top: 10px;
+}
+
+#payment-result {
+	text-align: center;
+	padding: 30px;
+}
+
+#order-status-qr,
+#mobile-status-qr {
+	display: flex;
+	justify-content: center;
+	margin: 20px auto;
+}
+
+/* =========================
+휴대폰 주문
+========================= */
+
+#mobile-order-screen,
+#mobile-cart-screen,
+#mobile-complete-screen {
+	max-width: 100%;
+}
+
+#mobile-order-screen .menu-list {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+#mobile-order-screen .cart-bar {
+	position: sticky;
+	bottom: 0;
+}
+
+/* =========================
+푸터
+========================= */
+
+.footer {
+	text-align: center;
+	padding: 25px;
+	margin-top: 30px;
+	background: #f0e3d5;
+}
+
+/* =========================
+큰 글씨 모드
+========================= */
+
+/* 글자 확대는 JavaScript가 실제 텍스트 요소와 버튼 크기에 함께 적용 */
+
+/* =========================
+접근성 큰 버튼 모드
+========================= */
+
+body.accessibility-mode button {
+	min-height: 72px;
+	min-width: 90px;
+	padding: 17px 23px;
+	font-size: 21px;
+}
+
+body.accessibility-mode .menu-actions {
+	flex-direction: column;
+}
+
+body.accessibility-mode .menu-actions button {
+	width: 100%;
+}
+
+body.accessibility-mode .category-buttons {
+	gap: 15px;
+}
+
+body.accessibility-mode .category {
+	padding: 18px 25px;
+}
+
+body.accessibility-mode .main-button {
+	min-height: 80px;
+	font-size: 24px;
+}
+
+/* =========================
+태블릿
+========================= */
+
+@media (max-width: 900px) {
+	.menu-list {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.header {
+		align-items: flex-start;
+	}
+
+	.header-controls {
+		justify-content: flex-start;
+	}
+}
+
+/* =========================
+휴대폰
+========================= */
+
+@media (max-width: 600px) {
+	body {
+		font-size: 16px;
+	}
+
+	.header {
+		padding: 15px;
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.header h1 {
+		font-size: 24px;
+	}
+
+	.header-controls {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.language-controls,
+	.text-controls {
+		justify-content: center;
+	}
+
+	.screen {
+		padding: 20px 12px;
+	}
+
+	.welcome {
+		padding: 35px 18px;
+		margin: 15px auto;
+	}
+
+	#welcome-title {
+		font-size: 32px;
+	}
+
+	.menu-list {
+		grid-template-columns: 1fr;
+		gap: 15px;
+	}
+
+	#mobile-order-screen .menu-list {
+		grid-template-columns: 1fr;
+	}
+
+	.menu-item img {
+		height: 210px;
+	}
+
+	.dining-options {
+		grid-template-columns: 1fr;
+	}
+
+	.dining-options button {
+		min-height: 110px;
+	}
+
+	.cart-bar {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.cart-bar button {
+		width: 100%;
+	}
+
+	.cart-item {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.category-buttons {
+		gap: 8px;
+	}
+
+	.category {
+		padding: 10px 14px;
+	}
+
+	.main-button {
+		width: 100%;
+	}
+
+	.modal-content {
+		padding: 22px;
+	}
+}
+
+/* =========================
+모션 최소화 설정
+========================= */
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		scroll-behavior: auto !important;
+		transition-duration: 0.01ms !important;
+		animation-duration: 0.01ms !important;
+	}
+}
+
+/* 통합 관리자 및 주문 상태 화면 */
+.admin-container { max-width: 900px; }
+.admin-login { display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
+.admin-login input { flex:1 1 220px; min-width:0; padding:14px; border:1px solid var(--light-brown); border-radius:10px; background:#fff; }
+#orders-area article { background:#fff; padding:20px; margin:15px 0; border-radius:15px; box-shadow:var(--shadow); }
+#orders-area article button { background:var(--brown); color:#fff; border-radius:10px; padding:12px 18px; }
+#status-screen { max-width:440px; margin:40px auto; padding:30px; text-align:center; background:#fff; border-radius:20px; box-shadow:var(--shadow); }
+#status-screen h1 { color:var(--brown); }
+#status-screen p:last-child { margin:25px 0; padding:22px; background:#f3eee8; border-radius:15px; font-size:22px; font-weight:bold; color:var(--dark-brown); }
+</style>
+</head>
+
+<body>
+
+<header class="header">
+	<h1 id="cafe-title">우리 카페</h1>
+
+	<div class="header-controls">
+		<div class="language-controls">
+			<button class="language-button active" data-lang="ko">한국어</button>
+			<button class="language-button" data-lang="en">English</button>
+			<button class="language-button" data-lang="zh">中文</button>
+			<button class="language-button" data-lang="ja">日本語</button>
+			<button class="language-button" data-lang="vi">Tiếng Việt</button>
+		</div>
+
+		<div class="text-controls">
+			<span id="text-size-label" data-translate="글자 크기">글자 크기</span>
+			<button id="small-text" data-translate="작게">작게</button>
+			<button id="large-text" data-translate="크게">크게</button>
+			<button id="accessibility-button" data-translate="큰 버튼 모드">큰 버튼 모드</button>
+		</div>
+	</div>
+</header>
+
+<main>
+
+	<!-- 시작 화면 -->
+	<section id="start-screen" class="screen">
+		<div class="welcome">
+			<p class="welcome-label">WELCOME</p>
+			<h2 id="welcome-title" data-translate="안녕하세요!">안녕하세요!</h2>
+			<p id="welcome-description" data-translate="원하시는 메뉴를 편하게 주문해 주세요.">
+				원하시는 메뉴를 편하게 주문해 주세요.
+			</p>
+
+			<button id="start-order" class="main-button">
+				메뉴 주문하기
+			</button>
+		</div>
+
+		<div class="qr-order-area">
+			<h3 id="qr-title" data-translate="휴대폰으로 주문하기">휴대폰으로 주문하기</h3>
+			<p id="qr-description" data-translate="QR코드를 촬영하면 휴대폰으로도 주문할 수 있습니다.">
+				QR코드를 촬영하면 휴대폰으로도 주문할 수 있습니다.
+			</p>
+
+			<div id="kiosk-qr-code"></div>
+
+			<p id="qr-help" data-translate="카메라로 QR코드를 스캔해 주세요.">
+				카메라로 QR코드를 스캔해 주세요.
+			</p>
+		</div>
+	</section>
+
+
+	<!-- 매장 식사 / 포장 선택 -->
+	<section id="dining-screen" class="screen hidden">
+		<div class="menu-container">
+			<h2 id="dining-title" data-translate="어떻게 이용하시겠어요?">어떻게 이용하시겠어요?</h2>
+			<p id="dining-description" data-translate="이용 방법을 선택해 주세요.">
+				이용 방법을 선택해 주세요.
+			</p>
+
+			<div class="dining-options">
+				<button id="dine-in-button" class="main-button">
+					🍽️ 매장에서 먹고 가기
+				</button>
+
+				<button id="takeout-button" class="main-button">
+					🥡 포장하기
+				</button>
+			</div>
+		</div>
+	</section>
+
+
+	<!-- 메뉴 선택 화면 -->
+	<section id="menu-screen" class="screen hidden">
+		<div class="menu-container">
+
+			<div class="menu-heading">
+				<h2 id="menu-heading-title">메뉴를 선택해 주세요</h2>
+				<p id="menu-heading-description">
+					원하는 음료와 디저트를 골라 주세요.
+				</p>
+
+				<p id="order-type-display"></p>
+			</div>
+
+			<!-- 메뉴 종류 -->
+			<nav class="category-buttons">
+				<button class="category active" data-category="전체">전체</button>
+				<button class="category" data-category="커피">커피</button>
+				<button class="category" data-category="음료">음료</button>
+				<button class="category" data-category="디저트">디저트</button>
+			</nav>
+
+			<!-- 메뉴 카드 -->
+			<div id="menu-list" class="menu-list"></div>
+
+			<!-- 메뉴 설명 팝업 -->
+			<div id="menu-detail-modal" class="modal hidden">
+				<div class="modal-content">
+					<button id="close-menu-detail" class="close-button">✕</button>
+					<div id="menu-detail-content"></div>
+				</div>
+			</div>
+
+			<!-- 장바구니 요약 -->
+			<div class="cart-bar">
+				<div>
+					<span id="cart-label" data-translate="담은 메뉴">담은 메뉴</span>
+					<strong id="cart-count">0개</strong>
+					<span id="total-label" data-translate="총 금액">총 금액</span>
+					<strong id="cart-total">0\</strong>
+				</div>
+
+				<button id="go-cart" class="main-button">
+					장바구니 확인
+				</button>
+			</div>
+
+		</div>
+	</section>
+
+
+	<!-- 장바구니 화면 -->
+	<section id="cart-screen" class="screen hidden">
+		<div class="menu-container">
+			<h2 id="cart-heading" data-translate="장바구니">장바구니</h2>
+			<p id="cart-description" data-translate="선택한 메뉴를 확인해 주세요.">선택한 메뉴를 확인해 주세요.</p>
+
+			<div id="cart-list"></div>
+
+			<div class="cart-bar">
+				<div>
+					<span id="cart-total-label" data-translate="총 금액">총 금액</span>
+					<strong id="cart-page-total">0\</strong>
+				</div>
+
+				<button id="back-menu" class="category" data-translate="메뉴 더 추가">
+					메뉴 더 추가
+				</button>
+
+				<button id="go-options" class="main-button" data-translate="다음 단계">
+					다음 단계
+				</button>
+			</div>
+		</div>
+	</section>
+
+
+	<!-- 추가 서비스 화면 -->
+	<section id="options-screen" class="screen hidden">
+		<div class="menu-container">
+			<h2 id="options-heading" data-translate="원하는 서비스를 선택해 주세요">원하는 서비스를 선택해 주세요</h2>
+			<p id="options-description" data-translate="필요한 서비스만 선택해 주세요.">
+				필요한 서비스만 선택해 주세요.
+			</p>
+
+			<div class="menu-card">
+				<label>
+					<input type="checkbox" id="recommend-option">
+					<span id="recommend-label" data-translate="추가 메뉴 추천">추가 메뉴 추천</span>
+				</label>
+			</div>
+
+			<div class="menu-card">
+				<label>
+					<input type="checkbox" id="point-option">
+					<span id="point-label" data-translate="포인트 적립">포인트 적립</span>
+				</label>
+			</div>
+
+			<div class="menu-card">
+				<label>
+					<input type="checkbox" id="coupon-option">
+					<span id="coupon-label" data-translate="쿠폰 및 할인">쿠폰 및 할인</span>
+				</label>
+			</div>
+
+			<button id="skip-options" class="category" data-translate="선택 없이 넘어가기">
+				선택 없이 넘어가기
+			</button>
+
+			<button id="continue-options" class="main-button">
+				다음 단계
+			</button>
+		</div>
+	</section>
+
+
+	<!-- 결제 화면 -->
+	<section id="payment-screen" class="screen hidden">
+		<div class="menu-container">
+			<h2 id="payment-heading" data-translate="결제하기">결제하기</h2>
+			<p id="payment-description" data-translate="주문하신 메뉴와 금액을 확인해 주세요.">
+				주문하신 메뉴와 금액을 확인해 주세요.
+			</p>
+
+			<div class="menu-card">
+				<h3 id="payment-total-label" data-translate="최종 결제 금액">최종 결제 금액</h3>
+				<h2 id="payment-total">0\</h2>
+			</div>
+
+			<div class="menu-card">
+				<h3 id="payment-method-heading" data-translate="결제 방법">결제 방법</h3>
+				<p id="payment-method" data-translate="💳 카드 결제">💳 카드 결제</p>
+				<p id="payment-instruction" data-translate="카드를 결제 단말기에 넣거나 태그해 주세요.">
+					카드를 결제 단말기에 넣거나 태그해 주세요.
+				</p>
+			</div>
+
+			<button id="pay-button" class="main-button" data-translate="결제 완료">
+				결제 완료
+			</button>
+
+			<div id="payment-result" class="menu-card hidden">
+				<h2 id="payment-success-title" data-translate="주문이 완료되었습니다!">주문이 완료되었습니다!</h2>
+
+				<h3 id="order-number"></h3>
+
+				<div id="completed-items"></div>
+
+				<div id="order-status-qr"></div>
+
+				<p id="order-status-description" data-translate="QR코드로 주문 진행 상황을 확인할 수 있습니다.">
+					QR코드로 주문 진행 상황을 확인할 수 있습니다.
+				</p>
+
+				<button id="home-button" class="main-button" data-translate="처음으로 돌아가기">
+					처음으로 돌아가기
+				</button>
+			</div>
+
+			<button id="back-options" class="category" data-translate="이전 화면으로">
+				이전 화면으로
+			</button>
+		</div>
+	</section>
+
+
+	<!-- 휴대폰 주문 화면 -->
+	<section id="mobile-order-screen" class="screen hidden">
+		<div class="menu-container">
+			<h2 id="mobile-order-heading">휴대폰 주문</h2>
+			<p id="mobile-order-description">
+				휴대폰에서 편리하게 주문해 주세요.
+			</p>
+
+			<div id="mobile-menu-list" class="menu-list"></div>
+
+			<div class="cart-bar">
+				<div>
+					<span id="mobile-cart-label" data-translate="담은 메뉴">담은 메뉴</span>
+					<strong id="mobile-cart-count">0개</strong>
+					<span id="mobile-total-label" data-translate="총 금액">총 금액</span>
+					<strong id="mobile-cart-total">0\</strong>
+				</div>
+
+				<button id="mobile-go-cart" class="main-button">
+					장바구니 확인
+				</button>
+			</div>
+		</div>
+	</section>
+
+
+	<!-- 휴대폰 장바구니 화면 -->
+	<section id="mobile-cart-screen" class="screen hidden">
+		<div class="menu-container">
+			<h2 id="mobile-cart-heading">주문 확인</h2>
+
+			<div id="mobile-cart-list"></div>
+
+			<button id="mobile-back-menu" class="category" data-translate="메뉴 더 추가">
+				메뉴 더 추가
+			</button>
+
+			<button id="mobile-go-order" class="main-button">
+				주문하기
+			</button>
+		</div>
+	</section>
+
+
+	<!-- 휴대폰 주문 완료 화면 -->
+	<section id="mobile-complete-screen" class="screen hidden">
+		<div class="menu-container">
+			<h2 id="mobile-complete-heading">주문이 완료되었습니다!</h2>
+
+			<h3 id="mobile-order-number"></h3>
+
+			<p id="mobile-complete-description">
+				주문 진행 상황을 확인할 수 있습니다.
+			</p>
+
+			<div id="mobile-status-qr"></div>
+		</div>
+	</section>
+
+
+	<!-- 관리자 화면: 주소 뒤에 ?mode=admin 을 붙여 접속 -->
+	<section id="admin-screen" class="screen hidden">
+	  <div class="menu-container admin-container">
+	    <h2>카페 관리자 주문 관리</h2>
+	    <div id="login-area" class="admin-login">
+	      <input id="admin-email" type="email" placeholder="관리자 이메일" autocomplete="username">
+	      <input id="admin-password" type="password" placeholder="비밀번호" autocomplete="current-password">
+	      <button id="login-button" class="main-button">로그인</button>
+	    </div>
+	    <p id="admin-message" role="status">관리자 로그인이 필요합니다.</p>
+	    <section id="orders-area" aria-live="polite"></section>
+	  </div>
+	</section>
+
+</main>
+
+<footer class="footer">
+	<p id="footer-text">우리 카페에 방문해 주셔서 감사합니다.</p>
+</footer>
+<script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-database-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-auth-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+
+// ==========================================
+// 카페 키오스크 전체 JavaScript
+// ==========================================
+
+const ADMIN_UID = "T8c660OJKEdxeL82mIGWHj9gkgh2";
+
+// 1. Firebase 설정
+const firebaseConfig = {
+  apiKey: "AIzaSyApjTiGG52lp6CiYqwUwMC7pIkcei71nqs",
+  authDomain: "kiosk-c57de.firebaseapp.com",
+  databaseURL: "https://kiosk-c57de-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "kiosk-c57de",
+  storageBucket: "kiosk-c57de.firebasestorage.app",
+  messagingSenderId: "782877561691",
+  appId: "1:782877561691:web:b2dca313d9ce27c238407e"
+};
+
+let database = null;
+let auth = null;
+let authReady = null;
+
+try {
+  if (window.firebase) {
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+
+    database = firebase.database();
+    auth = firebase.auth();
+
+    const isAdminMode = new URLSearchParams(window.location.search).get("mode") === "admin";
+    authReady = isAdminMode ? Promise.resolve() : auth.signInAnonymously()
+      .then(() => {
+        console.log("익명 로그인 성공!");
+      })
+      .catch(error => {
+        console.error("익명 로그인 실패:", error);
+        throw error;
+      });
+  }
+} catch (error) {
+  console.error("Firebase 연결 오류:", error);
+}
+
+
+// 2. 기본 상태
+let cart = [];
+let currentCategory = "전체";
+let currentLanguage = "ko";
+let orderType = "";
+let currentOrder = null;
+let isLargeText = false;
+
+
+// 3. 가격 표시
+// 현재 선택된 언어에 따라 통화 단위만 변경하고 숫자 형식은 유지한다.
+function money(number) {
+  const currencyUnits = {
+    ko: "원",
+    en: "KRW",
+    zh: "韩元",
+    ja: "ウォン",
+    vi: "KRW"
+  };
+
+  const amount = Number(number).toLocaleString("ko-KR");
+  const unit = currencyUnits[currentLanguage] || currencyUnits.ko;
+  return amount + unit;
+}
+
+
+// 4. 메뉴 정보
+const menus = [
+  {
+    id: 1,
+    name: "아메리카노",
+    category: "커피",
+    price: 3500,
+    description: "에스프레소에 물을 더해 깔끔하고 고소하게 즐기는 커피입니다.",
+    translations: {
+      en: ["Americano", "Coffee", "A clean and smooth espresso-based coffee."],
+      zh: ["美式咖啡", "咖啡", "加入水的浓缩咖啡，口感清爽。"],
+      ja: ["アメリカーノ", "コーヒー", "エスプレッソにお湯を加えたコーヒーです。"],
+      vi: ["Cà phê Americano", "Cà phê", "Cà phê espresso có thêm nước, mang hương vị thanh nhẹ và đậm đà."],
+    },
+    image: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=500"
+  },
+  {
+    id: 2,
+    name: "카페라떼",
+    category: "커피",
+    price: 4000,
+    description: "에스프레소와 부드러운 우유가 어우러진 커피입니다.",
+    translations: {
+      en: ["Cafe Latte", "Coffee", "Espresso blended with smooth milk."],
+      zh: ["拿铁咖啡", "咖啡", "浓缩咖啡与顺滑牛奶的组合。"],
+      ja: ["カフェラテ", "コーヒー", "エスプレッソとミルクのコーヒーです。"],
+      vi: ["Cà phê Latte", "Cà phê", "Cà phê espresso hòa quyện cùng sữa béo mịn."],
+    },
+    image: "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=500"
+  },
+  {
+    id: 3,
+    name: "바닐라라떼",
+    category: "커피",
+    price: 4500,
+    description: "에스프레소와 우유에 달콤한 바닐라 향을 더한 커피입니다.",
+    translations: {
+      en: ["Vanilla Latte", "Coffee", "Espresso and milk with sweet vanilla flavor."],
+      zh: ["香草拿铁", "咖啡", "加入香草风味的浓缩咖啡与牛奶。"],
+      ja: ["バニララテ", "コーヒー", "バニラ風味のエスプレッソとミルクです。"],
+      vi: ["Latte vani", "Cà phê", "Cà phê espresso và sữa với hương vani ngọt ngào."],
+    },
+    image: "https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?w=500"
+  },
+  {
+    id: 4,
+    name: "딸기라떼",
+    category: "음료",
+    price: 4800,
+    description: "달콤한 딸기와 우유가 어우러진 부드러운 음료입니다.",
+    translations: {
+      en: ["Strawberry Latte", "Drink", "A smooth drink made with strawberries and milk."],
+      zh: ["草莓牛奶", "饮料", "由草莓和牛奶制成的饮品。"],
+      ja: ["いちごラテ", "ドリンク", "イチゴとミルクを合わせた飲み物です。"],
+      vi: ["Latte dâu", "Đồ uống", "Thức uống dịu nhẹ kết hợp giữa dâu tây ngọt ngào và sữa."],
+    },
+    image: "images/strawberry-latte.jpg"
+  },
+  {
+    id: 5,
+    name: "말차라떼",
+    category: "음료",
+    price: 4800,
+    description: "말차 특유의 쌉싸름한 풍미와 우유의 부드러움을 느낄 수 있습니다.",
+    translations: {
+      en: ["Matcha Latte", "Drink", "A creamy drink with the gentle bitterness of matcha."],
+      zh: ["抹茶拿铁", "饮料", "带有抹茶风味的奶饮。"],
+      ja: ["抹茶ラテ", "ドリンク", "抹茶の風味とミルクのまろやかさを楽しめます。"],
+      vi: ["Latte Matcha", "Đồ uống", "Thức uống kết hợp vị chát nhẹ đặc trưng của matcha và vị béo mịn của sữa."],
+    },
+    image: "https://images.unsplash.com/photo-1515823064-d6e0c04616a7?w=500"
+  },
+  {
+    id: 6,
+    name: "초코라떼",
+    category: "음료",
+    price: 4500,
+    description: "초콜릿의 달콤하고 진한 맛을 우유와 함께 즐기는 음료입니다.",
+    translations: {
+      en: ["Chocolate Latte", "Drink", "A rich and sweet chocolate milk drink."],
+      zh: ["巧克力牛奶", "饮料", "浓郁香甜的巧克力牛奶。"],
+      ja: ["チョコラテ", "ドリンク", "チョコレートの甘い味わいを楽しめます。"],
+      vi: ["Latte sô cô la", "Đồ uống", "Thức uống sữa với hương vị sô cô la đậm đà và ngọt ngào."],
+    },
+    image: "images/choco-latte.jpg"
+  },
+  {
+    id: 7,
+    name: "치즈케이크",
+    category: "디저트",
+    price: 5500,
+    description: "크림치즈의 진한 풍미와 부드러운 식감이 특징인 디저트입니다.",
+    translations: {
+      en: ["Cheesecake", "Dessert", "A dessert with rich cream cheese flavor."],
+      zh: ["芝士蛋糕", "甜点", "奶油奶酪风味浓郁的甜点。"],
+      ja: ["チーズケーキ", "デザート", "クリームチーズの濃厚な風味が特徴です。"],
+      vi: ["Bánh phô mai", "Tráng miệng", "Món tráng miệng có hương vị phô mai kem đậm đà và kết cấu mềm mịn."],
+    },
+    image: "https://images.unsplash.com/photo-1524351199678-941a58a3df50?w=500"
+  },
+  {
+    id: 8,
+    name: "크루아상",
+    category: "디저트",
+    price: 3500,
+    description: "겹겹이 쌓인 반죽을 구워 바삭한 겉면과 부드러운 속을 살린 빵입니다.",
+    translations: {
+      en: ["Croissant", "Dessert", "A flaky pastry with a crisp outside and soft inside."],
+      zh: ["可颂面包", "甜点", "外层酥脆、内部柔软的面包。"],
+      ja: ["クロワッサン", "デザート", "外はサクサク、中はふんわりしたパンです。"],
+      vi: ["Bánh sừng bò", "Tráng miệng", "Bánh nhiều lớp với lớp vỏ giòn và phần ruột mềm xốp."],
+    },
+    image: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=500"
+  },
+  {
+    id: 9,
+    name: "아샷추",
+    category: "음료",
+    price: 4000,
+    description: "아이스티에 에스프레소 샷을 더한 음료입니다.",
+    translations: {
+      en: ["Iced Tea with Espresso", "Drink", "Sweet iced tea with an espresso shot."],
+      zh: ["浓缩咖啡冰茶", "饮料", "加入浓缩咖啡的甜味冰茶。"],
+      ja: ["エスプレッソ入りアイスティー", "ドリンク", "エスプレッソを加えた甘いアイスティーです。"],
+      vi: ["Trà đá espresso", "Đồ uống", "Trà đá ngọt kết hợp với một shot espresso."],
+    },
+    image: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=500"
+  },
+  {
+    id: 10,
+    name: "버블티",
+    category: "음료",
+    price: 4800,
+    description: "달콤한 차와 쫀득한 타피오카 펄을 함께 즐기는 음료입니다.",
+    translations: {
+      en: ["Bubble Tea", "Drink", "Sweet tea with chewy tapioca pearls."],
+      zh: ["珍珠奶茶", "饮料", "搭配珍珠的甜茶饮品。"],
+      ja: ["タピオカティー", "ドリンク", "タピオカ入りの甘いお茶です。"],
+      vi: ["Trà sữa trân châu", "Đồ uống", "Trà ngọt dùng cùng những viên trân châu dai mềm."],
+    },
+    image: "https://images.unsplash.com/photo-1558857563-b371033873b8?w=500"
+  },
+  {
+    id: 11,
+    name: "아포가토",
+    category: "디저트",
+    price: 5000,
+    description: "차가운 바닐라 아이스크림에 따뜻한 에스프레소를 부어 먹는 디저트입니다.",
+    translations: {
+      en: ["Affogato", "Dessert", "Vanilla ice cream topped with espresso."],
+      zh: ["阿芙佳朵", "甜点", "在香草冰淇淋上淋上浓缩咖啡。"],
+      ja: ["アフォガート", "デザート", "バニラアイスにエスプレッソをかけたデザートです。"],
+      vi: ["Affogato", "Tráng miệng", "Kem vani lạnh phủ espresso nóng."],
+    },
+    image: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=500"
+  },
+  {
+    id: 12,
+    name: "흑임자 스무디",
+    category: "음료",
+    price: 5500,
+    description: "고소한 흑임자를 부드럽게 갈아 만든 시원한 스무디입니다.",
+    translations: {
+      en: ["Black Sesame Smoothie", "Drink", "A cool smoothie made with black sesame."],
+      zh: ["黑芝麻冰沙", "饮料", "用黑芝麻制成的冰爽饮品。"],
+      ja: ["黒ごまスムージー", "ドリンク", "黒ごまを使った冷たいスムージーです。"],
+      vi: ["Sinh tố mè đen", "Đồ uống", "Sinh tố mát lạnh được xay mịn từ mè đen thơm bùi."],
+    },
+    image: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=500"
+  }
+];
+
+
+// 5. 화면 번역
+const translations = {
+  ko: {
+    "원하는 서비스를 선택해 주세요": "원하는 서비스를 선택해 주세요",
+    "필요한 서비스만 선택해 주세요.": "필요한 서비스만 선택해 주세요.",
+    "추가 메뉴 추천": "추가 메뉴 추천",
+    "포인트 적립": "포인트 적립",
+    "쿠폰 및 할인": "쿠폰 및 할인",
+    "선택 없이 넘어가기": "선택 없이 넘어가기",
+    "글자 크기": "글자 크기",
+    "작게": "작게",
+    "크게": "크게",
+    "큰 버튼 모드": "큰 버튼 모드",
+    "메뉴 주문하기": "메뉴 주문하기",
+    "매장에서 먹고 가기": "매장에서 먹고 가기",
+    "포장하기": "포장하기",
+    "전체": "전체",
+    "커피": "커피",
+    "음료": "음료",
+    "디저트": "디저트",
+    "설명 보기": "설명 보기",
+    "담기": "담기",
+    "장바구니": "장바구니",
+    "선택한 메뉴를 확인해 주세요.": "선택한 메뉴를 확인해 주세요.",
+    "메뉴 더 추가": "메뉴 더 추가",
+    "다음 단계": "다음 단계",
+    "주문하기": "주문하기",
+    "결제하기": "결제하기",
+    "처음으로": "처음으로",
+    "작은 글씨": "작은 글씨",
+    "큰 글씨": "큰 글씨",
+    "접근성 모드": "접근성 모드",
+    "장바구니가 비어 있습니다.": "장바구니가 비어 있습니다.",
+    "주문 방식": "주문 방식",
+    "매장": "매장",
+    "포장": "포장",
+    "총 금액": "총 금액",
+    "장바구니 확인": "장바구니 확인",
+    "담은 메뉴": "담은 메뉴",
+    "주문 번호": "주문 번호",
+    "주문 상태 확인": "주문 상태 확인",
+    "주문 접수": "주문 접수",
+    "안녕하세요!": "안녕하세요!",
+    "원하시는 메뉴를 편하게 주문해 주세요.": "원하시는 메뉴를 편하게 주문해 주세요.",
+    "휴대폰으로 주문하기": "휴대폰으로 주문하기",
+    "QR코드를 촬영하면 휴대폰으로도 주문할 수 있습니다.": "QR코드를 촬영하면 휴대폰으로도 주문할 수 있습니다.",
+    "카메라로 QR코드를 스캔해 주세요.": "카메라로 QR코드를 스캔해 주세요.",
+    "어떻게 이용하시겠어요?": "어떻게 이용하시겠어요?",
+    "주문하신 메뉴와 금액을 확인해 주세요.": "주문하신 메뉴와 금액을 확인해 주세요.",
+    "최종 결제 금액": "최종 결제 금액",
+    "결제 방법": "결제 방법",
+    "💳 카드 결제": "💳 카드 결제",
+    "카드를 결제 단말기에 넣거나 태그해 주세요.": "카드를 결제 단말기에 넣거나 태그해 주세요.",
+    "결제 완료": "결제 완료",
+    "주문이 완료되었습니다!": "주문이 완료되었습니다!",
+    "QR코드로 주문 진행 상황을 확인할 수 있습니다.": "QR코드로 주문 진행 상황을 확인할 수 있습니다.",
+    "처음으로 돌아가기": "처음으로 돌아가기",
+    "이전 화면으로": "이전 화면으로",
+    "이용 방법을 선택해 주세요.": "이용 방법을 선택해 주세요.",
+    '주문 진행 상황': '주문 진행 상황',
+    '현재 주문 상태': '현재 주문 상태',
+    '조리 중...': '조리 중...',
+    '서버 연결에 실패했습니다.': '서버 연결에 실패했습니다.',
+    '주문 정보를 찾을 수 없습니다.': '주문 정보를 찾을 수 없습니다.',
+    '로그인 또는 서버 연결에 실패했습니다.': '로그인 또는 서버 연결에 실패했습니다.'
+  },
+  en: {
+    "원하는 서비스를 선택해 주세요": "Please select the services you want.",
+    "필요한 서비스만 선택해 주세요.": "Please select only the services you need.",
+    "추가 메뉴 추천": "Recommend additional items",
+    "포인트 적립": "Earn points",
+    "쿠폰 및 할인": "Coupons and discounts",
+    "선택 없이 넘어가기": "Skip",
+    "글자 크기": "Text Size",
+    "작게": "Smaller",
+    "크게": "Larger",
+    "큰 버튼 모드": "Large Button Mode",
+    "메뉴 주문하기": "Start Order",
+    "매장에서 먹고 가기": "Dine In",
+    "포장하기": "Takeout",
+    "전체": "All",
+    "커피": "Coffee",
+    "음료": "Drinks",
+    "디저트": "Desserts",
+    "설명 보기": "Details",
+    "담기": "Add",
+    "장바구니": "Cart",
+    "선택한 메뉴를 확인해 주세요.": "Please review your selected items.",
+    "메뉴 더 추가": "Add More Items",
+    "다음 단계": "Next",
+    "주문하기": "Order",
+    "결제하기": "Payment",
+    "처음으로": "Home",
+    "작은 글씨": "Small Text",
+    "큰 글씨": "Large Text",
+    "접근성 모드": "Accessibility",
+    "장바구니가 비어 있습니다.": "Your cart is empty.",
+    "주문 방식": "Order Type",
+    "매장": "Dine In",
+    "포장": "Takeout",
+    "총 금액": "Total",
+    "장바구니 확인": "View Cart",
+    "담은 메뉴": "Items in Cart",
+    "주문 번호": "Order Number",
+    "주문 상태 확인": "Check Order Status",
+    "주문 접수": "Order Received",
+    "안녕하세요!": "Welcome!",
+    "원하시는 메뉴를 편하게 주문해 주세요.": "Please take your time and choose your order.",
+    "휴대폰으로 주문하기": "Order with Your Phone",
+    "QR코드를 촬영하면 휴대폰으로도 주문할 수 있습니다.": "Scan the QR code to place your order on your phone.",
+    "카메라로 QR코드를 스캔해 주세요.": "Please scan the QR code with your camera.",
+    "어떻게 이용하시겠어요?": "How would you like to enjoy your order?",
+    "주문하신 메뉴와 금액을 확인해 주세요.": "Please review your order and the total amount.",
+    "최종 결제 금액": "Final Total",
+    "결제 방법": "Payment Method",
+    "💳 카드 결제": "💳 Card Payment",
+    "카드를 결제 단말기에 넣거나 태그해 주세요.": "Please insert or tap your card on the payment terminal.",
+    "결제 완료": "Complete Payment",
+    "주문이 완료되었습니다!": "Your order is complete!",
+    "QR코드로 주문 진행 상황을 확인할 수 있습니다.": "Scan the QR code to check your order status.",
+    "처음으로 돌아가기": "Return to Home",
+    "이전 화면으로": "Previous Screen",
+    "이용 방법을 선택해 주세요.": "Please choose how you would like to order.",
+    '주문 진행 상황': 'Order Progress',
+    '현재 주문 상태': 'Current Order Status',
+    '조리 중...': 'Preparing...',
+    '서버 연결에 실패했습니다.': 'Server connection failed.',
+    '주문 정보를 찾을 수 없습니다.': 'Order not found.',
+    '로그인 또는 서버 연결에 실패했습니다.': 'Login or server connection failed.'
+  },
+  zh: {
+    "원하는 서비스를 선택해 주세요": "请选择您需要的服务。",
+    "필요한 서비스만 선택해 주세요.": "请选择您需要的服务即可。",
+    "추가 메뉴 추천": "推荐其他商品",
+    "포인트 적립": "积分累积",
+    "쿠폰 및 할인": "优惠券及折扣",
+    "선택 없이 넘어가기": "跳过",
+    "글자 크기": "字体大小",
+    "작게": "缩小",
+    "크게": "放大",
+    "큰 버튼 모드": "大按钮模式",
+    "메뉴 주문하기": "开始点餐",
+    "매장에서 먹고 가기": "堂食",
+    "포장하기": "打包",
+    "전체": "全部",
+    "커피": "咖啡",
+    "음료": "饮料",
+    "디저트": "甜点",
+    "설명 보기": "查看介绍",
+    "담기": "添加",
+    "장바구니": "购物车",
+    "선택한 메뉴를 확인해 주세요.": "请确认您选择的餐品。",
+    "메뉴 더 추가": "继续添加餐品",
+    "다음 단계": "下一步",
+    "주문하기": "下单",
+    "결제하기": "付款",
+    "처음으로": "首页",
+    "작은 글씨": "小字体",
+    "큰 글씨": "大字体",
+    "접근성 모드": "无障碍模式",
+    "장바구니가 비어 있습니다.": "购物车是空的。",
+    "주문 방식": "订单类型",
+    "매장": "堂食",
+    "포장": "打包",
+    "총 금액": "总金额",
+    "장바구니 확인": "查看购物车",
+    "담은 메뉴": "已选商品",
+    "주문 번호": "订单号码",
+    "주문 상태 확인": "查看订单状态",
+    "주문 접수": "已接收订单",
+    "안녕하세요!": "欢迎光临！",
+    "원하시는 메뉴를 편하게 주문해 주세요.": "请慢慢选择您想点的餐品。",
+    "휴대폰으로 주문하기": "使用手机点餐",
+    "QR코드를 촬영하면 휴대폰으로도 주문할 수 있습니다.": "扫描二维码，即可使用手机点餐。",
+    "카메라로 QR코드를 스캔해 주세요.": "请使用相机扫描二维码。",
+    "어떻게 이용하시겠어요?": "您想如何用餐？",
+    "주문하신 메뉴와 금액을 확인해 주세요.": "请确认您点选的餐品和金额。",
+    "최종 결제 금액": "最终支付金额",
+    "결제 방법": "支付方式",
+    "💳 카드 결제": "💳 刷卡支付",
+    "카드를 결제 단말기에 넣거나 태그해 주세요.": "请将银行卡插入或轻触支付终端。",
+    "결제 완료": "完成支付",
+    "주문이 완료되었습니다!": "订单已完成！",
+    "QR코드로 주문 진행 상황을 확인할 수 있습니다.": "扫描二维码即可查看订单进度。",
+    "처음으로 돌아가기": "返回首页",
+    "이전 화면으로": "返回上一页",
+    "이용 방법을 선택해 주세요.": "请选择用餐方式。",
+    '주문 진행 상황': '订单进度',
+    '현재 주문 상태': '当前订单状态',
+    '조리 중...': '正在制作中...',
+    '서버 연결에 실패했습니다.': '服务器连接失败。',
+    '주문 정보를 찾을 수 없습니다.': '找不到订单信息。',
+    '로그인 또는 서버 연결에 실패했습니다.': '登录或服务器连接失败。'
+  },
+  ja: {
+    "원하는 서비스를 선택해 주세요": "ご希望のサービスを選択してください。",
+    "필요한 서비스만 선택해 주세요.": "必要なサービスのみ選択してください。",
+    "추가 메뉴 추천": "追加メニューのおすすめ",
+    "포인트 적립": "ポイントを貯める",
+    "쿠폰 및 할인": "クーポン・割引",
+    "선택 없이 넘어가기": "選択せずに進む",
+    "글자 크기": "文字サイズ",
+    "작게": "小さく",
+    "크게": "大きく",
+    "큰 버튼 모드": "大きなボタンモード",
+    "메뉴 주문하기": "注文する",
+    "매장에서 먹고 가기": "店内で食べる",
+    "포장하기": "持ち帰り",
+    "전체": "すべて",
+    "커피": "コーヒー",
+    "음료": "ドリンク",
+    "디저트": "デザート",
+    "설명 보기": "説明を見る",
+    "담기": "追加",
+    "장바구니": "カート",
+    "선택한 메뉴를 확인해 주세요.": "選択したメニューをご確認ください。",
+    "메뉴 더 추가": "メニューを追加する",
+    "다음 단계": "次へ",
+    "주문하기": "注文する",
+    "결제하기": "お支払い",
+    "처음으로": "ホーム",
+    "작은 글씨": "小さい文字",
+    "큰 글씨": "大きい文字",
+    "접근성 모드": "アクセシビリティ",
+    "장바구니가 비어 있습니다。": "カートは空です。",
+    "장바구니가 비어 있습니다.": "カートは空です。",
+    "주문 방식": "注文方法",
+    "매장": "店内",
+    "포장": "持ち帰り",
+    "총 금액": "合計金額",
+    "장바구니 확인": "カートを確認",
+    "담은 메뉴": "カート内の商品",
+    "주문 번호": "注文番号",
+    "주문 상태 확인": "注文状況を確認",
+    "주문 접수": "注文受付",
+    "안녕하세요!": "いらっしゃいませ！",
+    "원하시는 메뉴를 편하게 주문해 주세요.": "ご希望のメニューをゆっくりお選びください。",
+    "휴대폰으로 주문하기": "スマートフォンで注文",
+    "QR코드를 촬영하면 휴대폰으로도 주문할 수 있습니다.": "QRコードを読み取ると、スマートフォンから注文できます。",
+    "카메라로 QR코드를 스캔해 주세요.": "カメラでQRコードを読み取ってください。",
+    "어떻게 이용하시겠어요?": "どのようにご利用になりますか？",
+    "주문하신 메뉴와 금액을 확인해 주세요.": "ご注文の商品と金額をご確認ください。",
+    "최종 결제 금액": "お支払い合計金額",
+    "결제 방법": "お支払い方法",
+    "💳 카드 결제": "💳 カード決済",
+    "카드를 결제 단말기에 넣거나 태그해 주세요.": "カードを決済端末に挿入するか、タッチしてください。",
+    "결제 완료": "お支払いを完了する",
+    "주문이 완료되었습니다!": "ご注文が完了しました！",
+    "QR코드로 주문 진행 상황을 확인할 수 있습니다.": "QRコードから注文状況をご確認いただけます。",
+    "처음으로 돌아가기": "ホームに戻る",
+    "이전 화면으로": "前の画面に戻る",
+    "이용 방법을 선택해 주세요.": "ご利用方法をお選びください。"
+  }
+  ,vi: {
+    '원하는 서비스를 선택해 주세요': 'Vui lòng chọn dịch vụ bạn muốn.',
+    '필요한 서비스만 선택해 주세요.': 'Vui lòng chỉ chọn những dịch vụ cần thiết.',
+    '추가 메뉴 추천': 'Gợi ý món thêm',
+    '포인트 적립': 'Tích lũy điểm',
+    '쿠폰 및 할인': 'Phiếu giảm giá và ưu đãi',
+    '선택 없이 넘어가기': 'Bỏ qua',
+    '글자 크기': 'Cỡ chữ',
+    '작게': 'Nhỏ hơn',
+    '크게': 'Lớn hơn',
+    '큰 버튼 모드': 'Chế độ nút lớn',
+    '메뉴 주문하기': 'Bắt đầu đặt món',
+    '매장에서 먹고 가기': 'Dùng tại quán',
+    '포장하기': 'Mang đi',
+    '전체': 'Tất cả',
+    '커피': 'Cà phê',
+    '음료': 'Đồ uống',
+    '디저트': 'Món tráng miệng',
+    '설명 보기': 'Xem chi tiết',
+    '담기': 'Thêm',
+    '장바구니': 'Giỏ hàng',
+    '선택한 메뉴를 확인해 주세요.': 'Vui lòng kiểm tra các món đã chọn.',
+    '메뉴 더 추가': 'Thêm món',
+    '다음 단계': 'Tiếp theo',
+    '주문하기': 'Đặt hàng',
+    '결제하기': 'Thanh toán',
+    '처음으로': 'Trang chủ',
+    '작은 글씨': 'Chữ nhỏ',
+    '큰 글씨': 'Chữ lớn',
+    '접근성 모드': 'Chế độ hỗ trợ tiếp cận',
+    '장바구니가 비어 있습니다.': 'Giỏ hàng đang trống.',
+    '주문 방식': 'Hình thức đặt hàng',
+    '매장': 'Tại quán',
+    '포장': 'Mang đi',
+    '총 금액': 'Tổng tiền',
+    '장바구니 확인': 'Xem giỏ hàng',
+    '담은 메뉴': 'Món đã chọn',
+    '주문 번호': 'Mã đơn hàng',
+    '주문 상태 확인': 'Kiểm tra trạng thái đơn hàng',
+    '주문 접수': 'Đã nhận đơn hàng',
+    '안녕하세요!': 'Xin chào!',
+    '원하시는 메뉴를 편하게 주문해 주세요.': 'Vui lòng thoải mái chọn món bạn muốn.',
+    '휴대폰으로 주문하기': 'Đặt món bằng điện thoại',
+    'QR코드를 촬영하면 휴대폰으로도 주문할 수 있습니다.': 'Quét mã QR để đặt món bằng điện thoại.',
+    '카메라로 QR코드를 스캔해 주세요.': 'Vui lòng dùng camera để quét mã QR.',
+    '어떻게 이용하시겠어요?': 'Bạn muốn sử dụng dịch vụ như thế nào?',
+    '주문하신 메뉴와 금액을 확인해 주세요.': 'Vui lòng kiểm tra các món đã đặt và số tiền.',
+    '최종 결제 금액': 'Tổng tiền thanh toán',
+    '결제 방법': 'Phương thức thanh toán',
+    '💳 카드 결제': '💳 Thanh toán bằng thẻ',
+    '카드를 결제 단말기에 넣거나 태그해 주세요.': 'Vui lòng đưa thẻ vào hoặc chạm thẻ vào máy thanh toán.',
+    '결제 완료': 'Hoàn tất thanh toán',
+    '주문이 완료되었습니다!': 'Đơn hàng của bạn đã hoàn tất!',
+    'QR코드로 주문 진행 상황을 확인할 수 있습니다.': 'Quét mã QR để theo dõi tình trạng đơn hàng.',
+    '처음으로 돌아가기': 'Quay về trang chủ',
+    '이전 화면으로': 'Quay lại màn hình trước',
+    '이용 방법을 선택해 주세요.': 'Vui lòng chọn cách sử dụng dịch vụ.',
+    '주문 진행 상황': 'Tiến độ đơn hàng',
+    '현재 주문 상태': 'Trạng thái đơn hàng hiện tại',
+    '조리 중...': 'Đang chuẩn bị...',
+    '서버 연결에 실패했습니다.': 'Không thể kết nối máy chủ.',
+    '주문 정보를 찾을 수 없습니다.': 'Không tìm thấy thông tin đơn hàng.',
+    '로그인 또는 서버 연결에 실패했습니다.': 'Đăng nhập hoặc kết nối máy chủ không thành công.',
+    '주문 진행 상황': '注文の進行状況',
+    '현재 주문 상태': '現在の注文状況',
+    '조리 중...': '調理中...',
+    '서버 연결에 실패했습니다.': 'サーバーに接続できませんでした。',
+    '주문 정보를 찾을 수 없습니다.': '注文情報が見つかりません。',
+    '로그인 또는 서버 연결에 실패했습니다.': 'ログインまたはサーバー接続に失敗しました。'
+  }
+};
+
+
+// 6. 번역 문구 가져오기
+function t(koreanText) {
+  return translations[currentLanguage]?.[koreanText] || koreanText;
+}
+
+
+// 7. 화면 전환
+function showScreen(screenId) {
+  document.querySelectorAll(".screen").forEach(screen => {
+    screen.classList.add("hidden");
+    screen.style.display = "";
+  });
+
+  const target = document.getElementById(screenId);
+
+  if (target) {
+    target.classList.remove("hidden");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  } else {
+    console.error("화면을 찾을 수 없습니다:", screenId);
+  }
+}
+
+
+
+// 8. 메뉴 이름과 설명 번역
+function getMenuText(menu) {
+  const data = menu.translations?.[currentLanguage];
+
+  return {
+    name: data ? data[0] : menu.name,
+    category: data ? data[1] : t(menu.category),
+    description: data ? data[2] : menu.description
+  };
+}
+
+
+// 9. 메뉴 카드 만들기
+function createMenuCard(menu, mobile = false) {
+  const translated = getMenuText(menu);
+
+  const item = document.createElement("article");
+  item.className = "menu-item";
+
+  const image = document.createElement("img");
+  image.src = menu.image;
+  image.alt = translated.name;
+  image.onerror = () => {
+    image.style.display = "none";
+  };
+
+  const content = document.createElement("div");
+  content.className = "menu-item-content";
+
+  const name = document.createElement("h3");
+  name.textContent = translated.name;
+
+  const category = document.createElement("p");
+  category.textContent = translated.category;
+
+  const price = document.createElement("strong");
+  price.textContent = money(menu.price);
+
+  const actions = document.createElement("div");
+  actions.className = "menu-actions";
+
+  const detailButton = document.createElement("button");
+  detailButton.className = "detail-button";
+  detailButton.textContent = t("설명 보기");
+  detailButton.addEventListener("click", () => {
+    showMenuDetail(menu);
+  });
+
+  const addButton = document.createElement("button");
+  addButton.className = "add-button";
+  addButton.textContent = t("담기");
+  addButton.addEventListener("click", () => {
+    addToCart(menu.id, mobile);
+  });
+
+  actions.append(detailButton, addButton);
+  content.append(name, category, price, actions);
+  item.append(image, content);
+
+  return item;
+}
+
+
+// 10. 메뉴 화면 표시
+function renderMenus() {
+  const desktopList = document.getElementById("menu-list");
+  const mobileList = document.getElementById("mobile-menu-list");
+
+  const filteredMenus = currentCategory === "전체"
+    ? menus
+    : menus.filter(menu => menu.category === currentCategory);
+
+  if (desktopList) {
+    desktopList.replaceChildren();
+
+    filteredMenus.forEach(menu => {
+      desktopList.appendChild(createMenuCard(menu));
+    });
+  }
+
+  if (mobileList) {
+    mobileList.replaceChildren();
+
+    menus.forEach(menu => {
+      mobileList.appendChild(createMenuCard(menu, true));
+    });
+  }
+}
+
+
+// 11. 메뉴 설명
+function showMenuDetail(menu) {
+  const translated = getMenuText(menu);
+  const modal = document.getElementById("menu-detail-modal");
+  const content = document.getElementById("menu-detail-content");
+
+  if (!modal || !content) {
+    alert(translated.name + "\n\n" + translated.description);
+    return;
+  }
+
+  content.replaceChildren();
+
+  const title = document.createElement("h2");
+  title.textContent = translated.name;
+
+  const description = document.createElement("p");
+  description.textContent = translated.description;
+
+  const price = document.createElement("strong");
+  price.textContent = money(menu.price);
+
+  content.append(title, description, price);
+  modal.classList.remove("hidden");
+}
+
+
+// 12. 장바구니에 추가
+function addToCart(menuId, mobile = false) {
+  const menu = menus.find(item => item.id === menuId);
+  if (!menu) return;
+
+  const existing = cart.find(item => item.id === menuId);
+
+  if (existing) {
+    existing.quantity++;
+  } else {
+    cart.push({
+      id: menu.id,
+      name: menu.name,
+      price: menu.price,
+      quantity: 1
+    });
+  }
+
+  updateCart();
+
+  if (mobile) {
+    alert(getMenuText(menu).name + " - " + t("담기"));
+  }
+}
+
+
+// 13. 수량 변경
+function changeQuantity(menuId, amount) {
+  const item = cart.find(menu => menu.id === menuId);
+  if (!item) return;
+
+  item.quantity += amount;
+
+  if (item.quantity <= 0) {
+    cart = cart.filter(menu => menu.id !== menuId);
+  }
+
+  updateCart();
+}
+
+
+// 14. 총액과 수량
+function getCartTotal() {
+  return cart.reduce((total, item) => {
+    return total + item.price * item.quantity;
+  }, 0);
+}
+
+function getCartCount() {
+  return cart.reduce((total, item) => {
+    return total + item.quantity;
+  }, 0);
+}
+
+
+// 15. 장바구니 표시
+function renderCartList(elementId) {
+  const list = document.getElementById(elementId);
+  if (!list) return;
+
+  list.replaceChildren();
+
+  if (cart.length === 0) {
+    const empty = document.createElement("p");
+    empty.textContent = t("장바구니가 비어 있습니다.");
+    list.appendChild(empty);
+    return;
+  }
+
+  cart.forEach(item => {
+    const row = document.createElement("div");
+    row.className = "cart-item";
+
+    const menu = menus.find(m => m.id === item.id);
+    const name = document.createElement("strong");
+    name.textContent = menu ? getMenuText(menu).name : item.name;
+
+    const price = document.createElement("span");
+    price.textContent = money(item.price * item.quantity);
+
+    const controls = document.createElement("div");
+    controls.className = "quantity-controls";
+
+    const minus = document.createElement("button");
+    minus.textContent = "−";
+    minus.setAttribute("aria-label", "수량 줄이기");
+    minus.addEventListener("click", () => changeQuantity(item.id, -1));
+
+    const quantity = document.createElement("span");
+    quantity.textContent = item.quantity;
+
+    const plus = document.createElement("button");
+    plus.textContent = "+";
+    plus.setAttribute("aria-label", "수량 늘리기");
+    plus.addEventListener("click", () => changeQuantity(item.id, 1));
+
+    controls.append(minus, quantity, plus);
+    row.append(name, price, controls);
+    list.appendChild(row);
+  });
+}
+
+
+// 16. 장바구니 전체 업데이트
+function updateCart() {
+  const count = getCartCount();
+  const total = money(getCartTotal());
+
+  const elements = {
+    "cart-count": count,
+    "cart-total": total,
+    "cart-page-total": total,
+    "mobile-cart-count": count,
+    "mobile-cart-total": total
+  };
+
+  Object.entries(elements).forEach(([id, value]) => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value;
+  });
+
+  renderCartList("cart-list");
+  renderCartList("mobile-cart-list");
+}
+
+
+// 17. 주문 번호 만들기
+function makeOrderNumber() {
+  const date = new Date();
+
+  const dateText =
+    String(date.getFullYear()).slice(-2) +
+    String(date.getMonth() + 1).padStart(2, "0") +
+    String(date.getDate()).padStart(2, "0");
+
+  const random = Math.floor(1000 + Math.random() * 9000);
+
+  return dateText + "-" + random;
+}
+
+
+// 18. QR 코드 만들기
+function makeQRCode(elementId, text) {
+  const container = document.getElementById(elementId);
+  if (!container) return;
+
+  container.replaceChildren();
+
+  if (typeof QRCode === "undefined") {
+    container.textContent = "QR 코드 기능을 불러오지 못했습니다.";
+    console.error("QRCode 라이브러리가 없습니다.");
+    return;
+  }
+
+  try {
+    new QRCode(container, {
+      text: text,
+      width: 160,
+      height: 160,
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  } catch (error) {
+    console.error("QR 코드 생성 오류:", error);
+    container.textContent = "QR 코드 생성에 실패했습니다.";
+  }
+}
+
+
+// 19. 첫 화면 QR 코드
+function createWelcomeQR() {
+  const mobileURL = new URL(window.location.href);
+  mobileURL.searchParams.set("mode", "mobile");
+
+  makeQRCode("kiosk-qr-code", mobileURL.href);
+}
+
+
+
+// 20. Firebase 주문
+async function saveOrderToFirebase(order) {
+  console.log("주문 저장 함수 실행됨!", order);
+
+  if (!database || !auth || !authReady) {
+    console.warn("Firebase 연결 또는 인증이 준비되지 않았습니다.");
+    return false;
+  }
+
+  try {
+    await authReady;
+
+    const user = auth.currentUser;
+
+    if (!user) {
+      console.error("로그인된 사용자가 없습니다.");
+      return false;
+    }
+
+    order.userId = user.uid;
+
+    await database.ref("orders/" + order.orderNumber).set(order);
+
+    console.log("주문 저장 성공!");
+    return true;
+
+  } catch (error) {
+    console.error("Firebase 주문 저장 실패:", error);
+    return false;
+  }
+}
+
+// 21. 주문 완료
+async function completeOrder() {
+  if (cart.length === 0) {
+    alert("메뉴를 먼저 선택해 주세요.");
+    return;
+  }
+
+  if (!orderType) {
+    alert("매장 또는 포장을 선택해 주세요.");
+    showScreen("dining-screen");
+    return;
+  }
+
+  const orderNumber = makeOrderNumber();
+
+  currentOrder = {
+    orderNumber,
+    orderType,
+    userId: auth?.currentUser ? auth.currentUser.uid : null,
+    items: cart.map(item => ({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity
+    })),
+    total: getCartTotal(),
+    // 결제 완료 후 고객 주문 조회 화면에 표시할 초기 진행 상태
+    status: "조리 중...",
+    createdAt: new Date().toISOString()
+  };
+
+  const orderNumberElement = document.getElementById("order-number");
+  const completedItems = document.getElementById("completed-items");
+  const paymentTotal = document.getElementById("payment-total");
+
+  if (orderNumberElement) {
+    orderNumberElement.textContent = orderNumber;
+  }
+
+  if (completedItems) {
+    completedItems.textContent = currentOrder.items.map(item => {
+      const menu = menus.find(m => m.id === item.id);
+      const name = menu ? getMenuText(menu).name : item.name;
+      return name + " × " + item.quantity;
+    }).join(", ");
+  }
+
+  if (paymentTotal) {
+    paymentTotal.textContent = money(currentOrder.total);
+  }
+
+  const mobileOrderNumber = document.getElementById("mobile-order-number");
+  if (mobileOrderNumber) {
+    mobileOrderNumber.textContent = orderNumber;
+  }
+
+  showScreen("payment-screen");
+  
+// QR 스캔 시 현재 키오스크 페이지의 주문 상태 조회 모드로 이동한다.
+// 배포된 HTTPS 주소를 기준으로 생성되므로 휴대폰에서도 같은 페이지를 열 수 있다.
+const statusURL = new URL(window.location.href);
+statusURL.searchParams.set("mode", "status");
+statusURL.searchParams.set("order", orderNumber);
+makeQRCode("order-status-qr", statusURL.href);
+  const saved = await saveOrderToFirebase(currentOrder);
+  const result = document.getElementById("payment-result");
+
+  if (result) {
+    result.classList.remove("hidden");
+
+    const payButton = document.getElementById("pay-button");
+    if (payButton) {
+      payButton.classList.add("hidden");
+    }
+
+    const message = document.createElement("p");
+    message.textContent = saved
+      ? "주문 정보가 저장되었습니다. 실제 결제는 진행되지 않았습니다."
+      : "주문 화면은 표시되지만 서버 저장은 확인되지 않았습니다.";
+
+    result.prepend(message);
+  }
+}
+
+// 22. 언어 변경
+function changeLanguage(language) {
+  if (!translations[language]) return;
+
+  currentLanguage = language;
+  document.documentElement.lang = language;
+
+  document.querySelectorAll(".language-button").forEach(button => {
+    button.classList.toggle("active", button.dataset.lang === language);
+  });
+
+  // 원문(한국어)을 기준으로 번역해 언어를 여러 번 바꿔도 문구가 누적·변형되지 않게 한다.
+  // 버튼 앞의 이모지는 유지하고, 버튼 안의 한국어 문구만 번역한다.
+  document.querySelectorAll("button:not(.language-button)").forEach(button => {
+    if (!button.hasAttribute("data-original-text")) {
+      button.dataset.originalText = button.textContent.trim();
+    }
+
+    const original = button.dataset.originalText;
+    let translatedText = original;
+
+    // 문구 앞의 이모지와 공백을 포함한 원래 버튼 표시를 보존한다.
+    const keys = Object.keys(translations.ko).sort((a, b) => b.length - a.length);
+    for (const key of keys) {
+      if (original.includes(key)) {
+        translatedText = original.replace(
+          key,
+          translations[language][key] || key
+        );
+        break;
+      }
+    }
+
+    button.textContent = translatedText;
+  });
+
+  // 정적 제목·설명 등 data-translate 요소 번역
+  document.querySelectorAll("[data-translate]").forEach(element => {
+    const key = element.dataset.translate;
+    const translated = translations[language][key];
+    if (translated) {
+      element.textContent = translated;
+    }
+  });
+
+  renderMenus();
+  updateCart();
+  if (typeof window.updateStatusScreenLanguage === "function") {
+    window.updateStatusScreenLanguage();
+  }
+}
+
+// 23. 글자 크기
+function setLargeText(enabled) {
+  isLargeText = enabled;
+  document.body.classList.toggle("large-text", enabled);
+
+  const SCALE = 1.3;
+
+  // 텍스트 노드가 실제로 들어 있는 요소를 찾아 글자만 30% 확대한다.
+  // 제목, 안내문, 첫 화면의 환영 문구, 메뉴명 등 화면 전반에 적용된다.
+  const textParents = new Set();
+  const walker = document.createTreeWalker(
+    document.body,
+    NodeFilter.SHOW_TEXT,
+    {
+      acceptNode(node) {
+        return node.textContent.trim()
+          ? NodeFilter.FILTER_ACCEPT
+          : NodeFilter.FILTER_REJECT;
+      }
+    }
+  );
+
+  while (walker.nextNode()) {
+    if (walker.currentNode.parentElement) {
+      textParents.add(walker.currentNode.parentElement);
+    }
+  }
+
+  textParents.forEach(element => {
+    if (!element.hasAttribute("data-original-font-size")) {
+      element.dataset.originalFontSize =
+        window.getComputedStyle(element).fontSize;
+    }
+
+    if (enabled) {
+      const original = parseFloat(element.dataset.originalFontSize);
+      element.style.fontSize = `${original * SCALE}px`;
+    } else {
+      element.style.fontSize = "";
+      delete element.dataset.originalFontSize;
+    }
+  });
+
+  // 버튼도 글자 확대 비율에 맞춰 여백과 최소 높이를 키운다.
+  // 버튼 안에 span 등이 있는 경우에도 버튼 자체 크기가 함께 커진다.
+  document.querySelectorAll("button, input[type='button'], input[type='submit']").forEach(button => {
+    if (!button.hasAttribute("data-original-padding")) {
+      const style = window.getComputedStyle(button);
+      button.dataset.originalPadding =
+        `${style.paddingTop}|${style.paddingRight}|${style.paddingBottom}|${style.paddingLeft}`;
+      button.dataset.originalMinHeight = style.minHeight;
+      button.dataset.originalMinWidth = style.minWidth;
+    }
+
+    if (enabled) {
+      const padding = button.dataset.originalPadding.split("|").map(value => {
+        const number = parseFloat(value);
+        return Number.isFinite(number) ? `${number * SCALE}px` : value;
+      });
+      button.style.padding =
+        `${padding[0]} ${padding[1]} ${padding[2]} ${padding[3]}`;
+
+      const minHeight = parseFloat(button.dataset.originalMinHeight);
+      if (Number.isFinite(minHeight) && minHeight > 0) {
+        button.style.minHeight = `${minHeight * SCALE}px`;
+      }
+
+      const minWidth = parseFloat(button.dataset.originalMinWidth);
+      if (Number.isFinite(minWidth) && minWidth > 0) {
+        button.style.minWidth = `${minWidth * SCALE}px`;
+      }
+    } else {
+      button.style.padding = "";
+      button.style.minHeight = "";
+      button.style.minWidth = "";
+      delete button.dataset.originalPadding;
+      delete button.dataset.originalMinHeight;
+      delete button.dataset.originalMinWidth;
+    }
+  });
+
+  const accessibilityButton = document.getElementById("accessibility-button");
+  if (accessibilityButton) {
+    accessibilityButton.setAttribute("aria-pressed", String(enabled));
+  }
+}
+
+// 24. 매장 / 포장 선택
+function chooseOrderType(type) {
+  orderType = type;
+  showScreen("menu-screen");
+}
+
+
+// 25. 버튼 연결
+function connectButtons() {
+
+  const startOrder = document.getElementById("start-order");
+
+  if (startOrder) {
+    startOrder.addEventListener("click", () => {
+      showScreen("dining-screen");
+    });
+  } else {
+    console.error("start-order 버튼을 HTML에서 찾을 수 없습니다.");
+  }
+
+  const dineIn = document.getElementById("dine-in-button");
+
+  if (dineIn) {
+    dineIn.addEventListener("click", () => {
+      chooseOrderType("매장");
+    });
+  }
+
+  const takeout = document.getElementById("takeout-button");
+
+  if (takeout) {
+    takeout.addEventListener("click", () => {
+      chooseOrderType("포장");
+    });
+  }
+
+  document.querySelectorAll("[data-category]").forEach(button => {
+    button.addEventListener("click", () => {
+      currentCategory = button.dataset.category;
+
+      document.querySelectorAll("[data-category]").forEach(item => {
+        item.classList.toggle("active", item === button);
+      });
+
+      renderMenus();
+    });
+  });
+
+  const goCart = document.getElementById("go-cart");
+
+  if (goCart) {
+    goCart.addEventListener("click", () => {
+      updateCart();
+      showScreen("cart-screen");
+    });
+  }
+
+  const backMenu = document.getElementById("back-menu");
+
+  if (backMenu) {
+    backMenu.addEventListener("click", () => showScreen("menu-screen"));
+  }
+
+  const goOptions = document.getElementById("go-options");
+
+  if (goOptions) {
+    goOptions.addEventListener("click", () => showScreen("options-screen"));
+  }
+
+  const skipOptions = document.getElementById("skip-options");
+
+  if (skipOptions) {
+    skipOptions.addEventListener("click", completeOrder);
+  }
+
+  const continueOptions = document.getElementById("continue-options");
+
+  if (continueOptions) {
+    continueOptions.addEventListener("click", completeOrder);
+  }
+
+  const payButton = document.getElementById("pay-button");
+  if (payButton) {
+  payButton.addEventListener("click", () => {
+    completeOrder();
+  });
+}
+
+  const homeButton = document.getElementById("home-button");
+
+  if (homeButton) {
+    homeButton.addEventListener("click", () => {
+      cart = [];
+      orderType = "";
+      currentOrder = null;
+      updateCart();
+      showScreen("start-screen");
+    });
+  }
+
+  const backOptions = document.getElementById("back-options");
+
+  if (backOptions) {
+    backOptions.addEventListener("click", () => showScreen("options-screen"));
+  }
+
+  const closeDetail = document.getElementById("close-menu-detail");
+
+  if (closeDetail) {
+    closeDetail.addEventListener("click", () => {
+      document.getElementById("menu-detail-modal")?.classList.add("hidden");
+    });
+  }
+
+  const smallText = document.getElementById("small-text");
+
+  if (smallText) {
+    smallText.addEventListener("click", () => setLargeText(false));
+  }
+
+  const largeText = document.getElementById("large-text");
+
+  if (largeText) {
+    largeText.addEventListener("click", () => setLargeText(true));
+  }
+
+  const accessibility = document.getElementById("accessibility-button");
+
+  if (accessibility) {
+    accessibility.addEventListener("click", () => {
+      setLargeText(!isLargeText);
+    });
+  }
+
+  document.querySelectorAll(".language-button").forEach(button => {
+    button.addEventListener("click", () => {
+      changeLanguage(button.dataset.lang);
+    });
+  });
+
+  const mobileGoCart = document.getElementById("mobile-go-cart");
+
+  if (mobileGoCart) {
+    mobileGoCart.addEventListener("click", () => {
+      updateCart();
+      showScreen("mobile-cart-screen");
+    });
+  }
+
+  const mobileBackMenu = document.getElementById("mobile-back-menu");
+
+  if (mobileBackMenu) {
+    mobileBackMenu.addEventListener("click", () => showScreen("mobile-order-screen"));
+  }
+
+  const mobileGoOrder = document.getElementById("mobile-go-order");
+
+  if (mobileGoOrder) {
+    mobileGoOrder.addEventListener("click", () => {
+      if (!orderType) {
+        alert("매장 또는 포장을 먼저 선택해 주세요.");
+        return;
+      }
+
+      completeOrder();
+    });
+  }
+}
+
+
+// 26. 모바일 주문 화면
+function setupMobileOrder() {
+  const params = new URLSearchParams(window.location.search);
+
+  if (params.get("mode") !== "mobile") return;
+
+  showScreen("mobile-order-screen");
+
+  const mobileScreen = document.getElementById("mobile-order-screen");
+  if (!mobileScreen) return;
+
+  if (!document.getElementById("mobile-order-type")) {
+    const choice = document.createElement("div");
+    choice.id = "mobile-order-type";
+    choice.className = "dining-options";
+
+    const title = document.createElement("h2");
+    title.textContent = "주문 방식을 선택해 주세요.";
+
+    const dineButton = document.createElement("button");
+    dineButton.textContent = "매장에서 먹고 가기";
+    dineButton.addEventListener("click", () => {
+      orderType = "매장";
+      title.textContent = "매장 식사를 선택했습니다.";
+    });
+
+    const takeoutButton = document.createElement("button");
+    takeoutButton.textContent = "포장하기";
+    takeoutButton.addEventListener("click", () => {
+      orderType = "포장";
+      title.textContent = "포장을 선택했습니다.";
+    });
+
+    choice.append(title, dineButton, takeoutButton);
+    mobileScreen.prepend(choice);
+  }
+
+  renderMenus();
+}
+
+// 27. 주문 상태 화면
+function setupStatusMode() {
+  const params = new URLSearchParams(window.location.search);
+  const orderNumber = params.get("order");
+
+  if (params.get("mode") !== "status" || !orderNumber) return;
+
+  const statusScreen = document.createElement("section");
+  statusScreen.id = "status-screen";
+
+  const title = document.createElement("h1");
+  const number = document.createElement("p");
+  const statusLabel = document.createElement("p");
+  const statusText = document.createElement("h2");
+  statusText.dataset.statusValue = "조리 중...";
+  statusText.setAttribute("aria-live", "polite");
+
+  statusScreen.append(title, number, statusLabel, statusText);
+  document.body.prepend(statusScreen);
+  window.updateStatusScreenLanguage = function() {
+    title.textContent = t("주문 진행 상황");
+    number.textContent = t("주문 번호") + ": " + orderNumber;
+    statusLabel.textContent = t("현재 주문 상태");
+    statusText.textContent = t(statusText.dataset.statusValue || "조리 중...");
+  };
+  window.updateStatusScreenLanguage();
+
+  document.querySelectorAll(".screen").forEach(screen => {
+    screen.classList.add("hidden");
+  });
+
+  if (!database || !auth || !authReady) {
+    statusText.dataset.statusValue = "서버 연결에 실패했습니다.";
+    window.updateStatusScreenLanguage();
+    return;
+  }
+
+  authReady.then(() => {
+    database.ref("orders/" + orderNumber + "/status")
+      .on("value", snapshot => {
+        statusText.dataset.statusValue = snapshot.exists()
+          ? snapshot.val()
+          : "주문 정보를 찾을 수 없습니다.";
+        window.updateStatusScreenLanguage();
+      });
+  }).catch(error => {
+    console.error(error);
+    statusText.dataset.statusValue = "로그인 또는 서버 연결에 실패했습니다.";
+    window.updateStatusScreenLanguage();
+  });
+}
+
+// 28. 프로그램 시작
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("카페 키오스크 시작");
+
+  renderMenus();
+  updateCart();
+  connectButtons();
+  createWelcomeQR();
+  setupMobileOrder();
+  setupStatusMode();
+
+  console.log("키오스크 초기화 완료");
+})
+
+
+// 관리자 기능은 키오스크 코드와 변수 충돌을 피하도록 별도 영역에서 실행합니다.
+(function setupAdminPage() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("mode") !== "admin") return;
+
+  document.querySelectorAll(".screen").forEach(screen => screen.classList.add("hidden"));
+  document.getElementById("admin-screen").classList.remove("hidden");
+  const header = document.querySelector(".header");
+  if (header) header.style.display = "none";
+  const footer = document.querySelector(".footer");
+  if (footer) footer.style.display = "none";
+
+  const ADMIN_UID = "T8c660OJKEdxeL82mIGWHj9gkgh2";
+  const auth = firebase.auth();
+  const database = firebase.database();
+  const message = document.getElementById("admin-message");
+  const ordersArea = document.getElementById("orders-area");
+
+  document.getElementById("login-button").addEventListener("click", async () => {
+    const email = document.getElementById("admin-email").value.trim();
+    const password = document.getElementById("admin-password").value;
+    try {
+      await auth.signInWithEmailAndPassword(email, password);
+    } catch (error) {
+      message.textContent = "로그인 실패: " + error.message;
+    }
+  });
+
+  auth.onAuthStateChanged(user => {
+    if (!user) {
+      message.textContent = "관리자 로그인이 필요합니다.";
+      ordersArea.replaceChildren();
+      document.getElementById("login-area").style.display = "flex";
+      return;
+    }
+    if (user.uid !== ADMIN_UID) {
+      message.textContent = "관리자 권한이 없습니다.";
+      auth.signOut();
+      return;
+    }
+    message.textContent = "관리자 로그인 성공!";
+    document.getElementById("login-area").style.display = "none";
+    loadOrders();
+  });
+
+  function loadOrders() {
+    database.ref("orders").on("value", snapshot => {
+      ordersArea.replaceChildren();
+      if (!snapshot.exists()) {
+        ordersArea.textContent = "접수된 주문이 없습니다.";
+        return;
+      }
+      snapshot.forEach(child => {
+        const order = child.val();
+        const card = document.createElement("article");
+        const heading = document.createElement("h3");
+        heading.textContent = "주문 번호: " + order.orderNumber;
+        const details = document.createElement("p");
+        details.textContent = (order.items || []).map(item => item.name + " x " + item.quantity).join(", ");
+        const total = document.createElement("p");
+        total.textContent = "결제 금액: " + Number(order.total || 0).toLocaleString("ko-KR") + "\\";
+        const status = document.createElement("p");
+        status.textContent = "상태: " + order.status;
+        const button = document.createElement("button");
+        button.textContent = "제조 완료 처리";
+        button.disabled = order.status === "제조 완료";
+        button.addEventListener("click", async () => {
+          try {
+            await database.ref("orders/" + child.key + "/status").set("제조 완료");
+            message.textContent = "주문 상태가 변경되었습니다.";
+          } catch (error) {
+            message.textContent = "상태 변경 실패: " + error.message;
+          }
+        });
+        card.append(heading, details, total, status, button);
+        ordersArea.appendChild(card);
+      });
+    }, error => {
+      message.textContent = "주문 목록 조회 실패: " + error.message;
+    });
+  }
+})();
+
+</script>
+</body>
+</html>
